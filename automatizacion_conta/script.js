@@ -316,6 +316,7 @@ function showState(state) {
     if (state !== 'content') {
         id('dashboard').classList.add('hidden');
         id('employees-grid').classList.add('hidden');
+        id('overview-chart-wrap').classList.add('hidden');
     }
 }
 
@@ -333,21 +334,38 @@ function renderView() {
     if (selectedName && allEmployees[selectedName]) {
         id('dashboard').classList.remove('hidden');
         id('employees-grid').classList.add('hidden');
+        id('overview-chart-wrap').classList.add('hidden');
         renderDashboard(allEmployees[selectedName]);
     } else {
         id('dashboard').classList.add('hidden');
+        id('overview-chart-wrap').classList.remove('hidden');
         id('employees-grid').classList.remove('hidden');
+        window.dashboardCharts?.destroyDashboardCharts();
         renderGrid(list);
     }
 }
 
-// renderiza las tarjetas de empleados en la vista principal 
+// renderiza las tarjetas de empleados en la vista principal
 function renderGrid(list) {
     const grid = id('employees-grid');
     if (!list.length) {
         grid.innerHTML = '<p class="no-results">Sin resultados para los filtros aplicados.</p>';
+        const overviewWrap = id('overview-chart-wrap');
+        if (overviewWrap) overviewWrap.classList.add('hidden');
         return;
     }
+
+    const statusCounts  = { done: 0, active: 0, behind: 0, halfdone: 0, no_date: 0 };
+    const statusPctSum  = { done: 0, active: 0, behind: 0, halfdone: 0, no_date: 0 };
+    list.forEach(emp => {
+        const m = metrics(emp);
+        if (m.status in statusCounts) {
+            statusCounts[m.status]++;
+            statusPctSum[m.status] += m.taskPct;
+        }
+    });
+    window.dashboardCharts?.renderOverviewChart(statusCounts);
+    window.dashboardCharts?.renderComplianceChart(statusCounts, statusPctSum);
 
     grid.innerHTML = list.map(emp => {
         const m          = metrics(emp);
@@ -433,6 +451,8 @@ function renderDashboard(emp) {
         : `${m.done} de ${m.total} tareas`;
 
     renderPeriodCards(m.byPeriodo);
+
+    window.dashboardCharts?.renderDashboardCharts(m.done, m.total, m.byPeriodo);
 
     renderTaskTable(emp.tasks, activePeriodo);
 }

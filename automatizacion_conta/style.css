@@ -724,6 +724,51 @@ td { padding: 12px 16px; vertical-align: middle; }
     font-style: italic;
 }
 
+/* ── Charts ── */
+.charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    box-shadow: var(--shadow);
+}
+
+.chart-card-header {
+    margin-bottom: 16px;
+}
+.chart-card-header h3 { font-size: 15px; font-weight: 700; }
+
+.chart-wrap {
+    height: 240px;
+    position: relative;
+}
+
+.overview-chart-wrap {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.chart-wrap--wide {
+    height: 220px;
+}
+
+@media (max-width: 900px) {
+    .overview-chart-wrap { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+    .charts-row { grid-template-columns: 1fr; }
+}
+
 /* ── Hidden util ── */
 .hidden { display: none !important; }
 
