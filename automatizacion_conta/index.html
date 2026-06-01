@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan de 90 Días — RH</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <div class="header-brand">
+                <div>
+                    <img src="Imagotipo_CIMA_Blanco (1).png" alt="CIMA Logo" width="250" height="80">
+                </div>
+                <div>
+                    <h1>Seguimiento - plan de 90 Días</h1>
+                </div>
+            </div>
+            <div class="header-actions">
+                <span id="last-updated" class="last-updated"></span>
+                <button id="btn-refresh" class="btn-icon" title="Actualizar datos">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                </button>
+                <button id="btn-config" class="btn-icon" title="Configurar fuente de datos">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/><path d="M12 2v2M12 20v2M2 12H4M20 12h2"/></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Config overlay -->
+    <div id="config-overlay" class="overlay hidden"></div>
+    <div id="config-panel" class="config-panel hidden">
+        <div class="config-header">
+            <h3>Configuración de datos</h3>
+            <button id="btn-cancel-config" class="btn-close">✕</button>
+        </div>
+        <div class="config-body">
+            <label for="sheets-url">URL del Google Sheets publicado como CSV</label>
+            <input type="url" id="sheets-url" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv">
+            <p class="config-hint">En Google Sheets: <strong>Archivo → Compartir → Publicar en la web → CSV</strong></p>
+        </div>
+        <div class="config-footer">
+            <button id="btn-save-config" class="btn-primary">Guardar y cargar</button>
+            <button id="btn-cancel-config2" class="btn-secondary">Cancelar</button>
+        </div>
+    </div>
+
+    <main>
+        <!-- Filters bar -->
+        <section class="filters-bar" id="filters-bar">
+            <span class="filters-bar-label">Filtrar por</span>
+
+            <div class="filter-group" id="fg-employee">
+                <span class="filter-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                </span>
+                <label for="filter-employee">Colaborador</label>
+                <span class="filter-divider"></span>
+                <div class="select-wrap">
+                    <select id="filter-employee">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="filter-group" id="fg-supervisor">
+                <span class="filter-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="2" width="8" height="5" rx="1"/><path d="M12 7v4M6 13h12"/><rect x="2" y="13" width="5" height="4" rx="1"/><rect x="9.5" y="13" width="5" height="4" rx="1"/><rect x="17" y="13" width="5" height="4" rx="1"/></svg>
+                </span>
+                <label for="filter-supervisor">Supervisor</label>
+                <span class="filter-divider"></span>
+                <div class="select-wrap">
+                    <select id="filter-supervisor">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="filter-group" id="fg-status">
+                <span class="filter-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+                </span>
+                <label for="filter-status">Estado</label>
+                <span class="filter-divider"></span>
+                <div class="select-wrap">
+                    <select id="filter-status">
+                        <option value="">Todos</option>
+                        <option value="behind">Rezagado</option>
+                        <option value="active">En curso</option>
+                        <option value="halfdone">Parcial</option>
+                        <option value="done">Completado</option>
+                        <option value="no_date">Sin fecha</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="filter-stats" id="filter-stats"></div>
+        </section>
+
+        <!-- State boxes -->
+        <div id="state-loading" class="state-box hidden">
+            <div class="spinner"></div>
+            <p>Cargando datos del plan…</p>
+        </div>
+        <div id="state-empty" class="state-box hidden">
+            <div class="state-icon">📋</div>
+            <h3>Sin datos configurados</h3>
+            <p>Configura la URL del Google Sheets para comenzar.</p>
+            <button id="btn-open-config" class="btn-primary">Configurar ahora</button>
+        </div>
+        <div id="state-error" class="state-box hidden">
+            <div class="state-icon">⚠</div>
+            <h3>Error al cargar</h3>
+            <p id="error-msg"></p>
+            <div class="state-actions">
+                <button id="btn-retry" class="btn-primary">Reintentar</button>
+                <button id="btn-reconfig" class="btn-secondary">Cambiar URL</button>
+            </div>
+        </div>
+
+        <!-- Dashboard: selected employee -->
+        <div id="dashboard" class="hidden">
+            <button id="btn-back" class="btn-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                Volver a todos
+            </button>
+
+            <div class="emp-header-card">
+                <div class="emp-avatar-lg" id="emp-avatar-lg"></div>
+                <div class="emp-header-info">
+                    <h2 id="emp-name"></h2>
+                    <div class="emp-meta">
+                        <span id="emp-id" class="emp-meta-item"></span>
+                        <span id="emp-supervisor" class="emp-meta-item"></span>
+                        <span id="emp-ingreso" class="emp-meta-item"></span>
+                    </div>
+                </div>
+                <div id="emp-status-badge"></div>
+            </div>
+
+            <!-- Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value" id="m-days-in">—</div>
+                    <div class="metric-label">Días en la empresa</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="m-days-left">—</div>
+                    <div class="metric-label">Días restantes del plan</div>
+                </div>
+                <div class="metric-card accent">
+                    <div class="metric-value" id="m-task-pct">—</div>
+                    <div class="metric-label">Tareas completadas</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="m-tasks-count">—</div>
+                    <div class="metric-label">Total tareas</div>
+                </div>
+            </div>
+
+            <!-- Progress -->
+            <div class="progress-card">
+                <div class="progress-card-header">
+                    <h3>Avance del plan</h3>
+                    <span id="prog-summary" class="prog-summary"></span>
+                </div>
+                <div class="progress-dual">
+                    <div class="progress-row">
+                        <span class="progress-row-label">Completado</span>
+                        <div class="progress-track">
+                            <div class="progress-fill green" id="prog-task-fill"></div>
+                        </div>
+                        <span class="progress-row-pct" id="prog-task-pct"></span>
+                    </div>
+                    <div class="progress-row">
+                        <span class="progress-row-label">Tiempo</span>
+                        <div class="progress-track timeline">
+                            <div class="progress-fill blue" id="prog-time-fill"></div>
+                            <span class="milestone" style="left:33.3%"></span>
+                            <span class="milestone" style="left:66.6%"></span>
+                        </div>
+                        <span class="progress-row-pct" id="prog-time-pct"></span>
+                    </div>
+                </div>
+                <div class="progress-periods-label">
+                    <span>Ingreso</span><span>Día 30</span><span>Día 60</span><span>Día 90</span>
+                </div>
+            </div>
+
+            <!-- Period breakdown -->
+            <div class="period-cards" id="period-cards"></div>
+
+            <!-- Task table -->
+            <div class="tasks-card">
+                <div class="tasks-card-header">
+                    <h3>Tareas del plan</h3>
+                    <div class="period-tabs" id="period-tabs">
+                        <button class="tab active" data-periodo="">Todos</button>
+                        <button class="tab" data-periodo="1-30">30 días</button>
+                        <button class="tab" data-periodo="31-60">60 días</button>
+                        <button class="tab" data-periodo="61-90">90 días</button>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table id="tasks-table">
+                        <thead>
+                            <tr>
+                                <th class="col-task">Tarea</th>
+                                <th class="col-periodo">Período</th>
+                                <th class="col-tipo">Tipo</th>
+                                <th class="col-status">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tasks-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Employees grid -->
+        <div id="employees-grid" class="employees-grid hidden"></div>
+    </main>
+
+    <script type="module" src="charts.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
