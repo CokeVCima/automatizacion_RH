@@ -137,7 +137,7 @@ function renderComplianceByStatus(counts, pctSums) {
         { key: 'done',     label: 'Completado', color: '#16a34a' },
         { key: 'active',   label: 'En curso',   color: '#2563eb' },
         { key: 'halfdone', label: 'Parcial',     color: '#ea580c' },
-        { key: 'behind',   label: 'Rezagado',    color: '#dc2626' },
+        { key: 'behind',   label: 'Rezagado?',    color: '#dc2626' },
         { key: 'no_date',  label: 'Sin fecha',   color: '#94a3b8' },
     ].filter(s => (counts[s.key] || 0) > 0);
 

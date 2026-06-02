@@ -1,7 +1,7 @@
 'use strict';
 const url = atob('aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvZS8yUEFDWC0xdlE3YmQ4MFpWSWI0ZC14VmdMQ0NNTzBEUVVpNlFUcktHUm5SelE0bEl6c2IxLTFtdUNnR0czSUFqLVhnQXdFTkdrUlJyWDk1Z1dxMERqQy9wdWI/b3V0cHV0PWNzdg==');
 const STORAGE_KEY = 'plan90_url';
-const SUBTASK_PREFIX = '↳'; //prefijo para identificar subtareas en el csv,
+const SUBTASK_PREFIX = '↳'; //prefijo para identificar subtareas en el csv
 const AVATAR_COLORS = ['#2563eb','#7c3aed','#db2777','#ea580c','#16a34a','#0891b2','#65a30d'];
 
 let allEmployees = {};   // { name: EmployeeObj }
@@ -317,6 +317,7 @@ function showState(state) {
         id('dashboard').classList.add('hidden');
         id('employees-grid').classList.add('hidden');
         id('overview-chart-wrap').classList.add('hidden');
+        id('supervisor-rating-card').classList.add('hidden');
     }
 }
 
@@ -335,16 +336,119 @@ function renderView() {
         id('dashboard').classList.remove('hidden');
         id('employees-grid').classList.add('hidden');
         id('overview-chart-wrap').classList.add('hidden');
+        id('supervisor-rating-card').classList.add('hidden');
         renderDashboard(allEmployees[selectedName]);
     } else {
         id('dashboard').classList.add('hidden');
         id('overview-chart-wrap').classList.remove('hidden');
         id('employees-grid').classList.remove('hidden');
+        renderSupervisorRating(supFilter, list);
         window.dashboardCharts?.destroyDashboardCharts();
         renderGrid(list);
     }
 }
 
+function renderSupervisorRating(supervisor, list) {
+    const card = id('supervisor-rating-card');
+    if (!supervisor || !list.length) {
+        card.classList.add('hidden');
+        card.innerHTML = '';
+        return;
+    }
+
+    const rating = supervisorRating(list);
+    card.className = `supervisor-rating-card rating-${rating.level}`;
+    card.innerHTML = `
+        <div class="rating-main">
+            <div>
+                <div class="rating-eyebrow">Calificación del supervisor</div>
+                <h2>${esc(supervisor)}</h2>
+            </div>
+            <div class="rating-score">
+                <span>${rating.score}</span>
+                <small>${esc(rating.label)}</small>
+            </div>
+        </div>
+        <div class="rating-metrics">
+            <div><strong>${rating.avgPct}%</strong><span>Cumplimiento promedio</span></div>
+            <div><strong>${rating.doneRate}%</strong><span>Planes completados</span></div>
+            <div><strong>${rating.behindRate}%</strong><span>Colaboradores con tareas pendientes</span></div>
+            <div><strong>${list.length}</strong><span>Colaboradores evaluados</span></div>
+        </div>`;
+}
+//rating para el supervisor, se calcula con base en el avance de los colaboradores a su cargo, se asigna una calificacion y etiqueta segun el resultado
+//cuidar tiempo de procesamiento
+
+function supervisorRating(list) {
+    const valid_no_date_employee = list.filter(emp => {
+        const m = metrics(emp);
+        return m.status !== 'no_date';
+    });
+
+    const valid_employees = valid_no_date_employee.length;
+    const missing_counts = list.length - valid_employees;
+
+    if (valid_employees === 0) {
+        return { score: 0, label: 'invalorable', level: 'critical', avgPct: 0, doneRate: 0, behindRate: 0, missingDatesCount: missing_counts };
+    }
+
+    let totalTaskPct = 0;
+    let behindCount = 0;
+    let doneCount = 0;
+
+    valid_no_date_employee.forEach(emp => {
+        const m = metrics(emp);
+        totalTaskPct += m.taskPct;
+        if (m.status === 'behind' || m.status === 'halfdone') behindCount++;
+        if (m.status === 'done') doneCount++;
+    });
+
+    const avgPct = Math.round(totalTaskPct / valid_employees);
+    const behindRate = Math.round((behindCount / valid_employees) * 100);
+    const doneRate = Math.round((doneCount / valid_employees) * 100);
+
+    const pilarEficiencia = avgPct * 0.40;
+    const pilarRiesgo     = Math.max(0, 40 - (behindRate * 0.40));
+    const pilarOnboarding = doneRate * 0.20;
+    const score = Math.round(pilarEficiencia + pilarRiesgo + pilarOnboarding);
+
+    let label, level;
+    if (score >= 85) { label = 'Excelente'; level = 'excellent'; }
+    else if (score >= 70) { label = 'Bueno'; level = 'good'; }
+    else if (score >= 50) { label = 'En riesgo'; level = 'risk'; }
+    else { label = 'Crítico'; level = 'critical'; }
+
+    return {
+        score,
+        avgPct,
+        doneRate,
+        behindRate,
+        missingDatesCount: missing_counts,
+        label,
+        level,
+    };
+}
+
+/*
+    const count = list.length;
+    const avgPct = Math.round(totals.taskPct / count);
+    const doneRate = Math.round((totals.done / count) * 100);
+    const behindRate = Math.round((totals.behind / count) * 100);
+    const halfdoneRate = Math.round((totals.halfdone / count) * 100);
+    const noDateRate = Math.round((totals.no_date / count) * 100);
+    const score = clamp(Math.round(
+        avgPct
+        + (doneRate * 0.05)
+        - (behindRate * 0.25)
+        - (halfdoneRate * 0.15)
+    ), 0, 100);
+
+    if (score >= 90) return { score, avgPct, doneRate, behindRate, label: 'Excelente', level: 'excellent', note: 'Avance esperado y bajo rezago.' };
+    if (score >= 75) return { score, avgPct, doneRate, behindRate, label: 'Bueno', level: 'good', note: 'El avance general sano.' };
+    if (score >= 60) return { score, avgPct, doneRate, behindRate, label: 'En riesgo', level: 'risk', note: 'Hay señales de atraso.' };
+    return { score, avgPct, doneRate, behindRate, label: 'Crítico', level: 'critical', note: 'Avance bajo.' };
+}
+*/
 // renderiza las tarjetas de empleados en la vista principal
 function renderGrid(list) {
     const grid = id('employees-grid');
@@ -504,6 +608,10 @@ function renderTaskTable(tasks, periodoFilter) {
 
 // auxiliares 
 function id(s) { return document.getElementById(s); }
+
+function clamp(n, min, max) {
+    return Math.min(max, Math.max(min, n));
+}
 
 function esc(str) {
     return (str || '')
