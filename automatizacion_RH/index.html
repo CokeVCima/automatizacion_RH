@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plan de 90 Días — RH</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="descargar.js"></script>
+    <script type="module" src="charts.js"></script>
 </head>
 <body>
 
@@ -12,7 +15,7 @@
         <div class="header-content">
             <div class="header-brand">
                 <div>
-                    <img src="assets/Imagotipo_CIMA_Blanco (1).png" alt="CIMA Logo" width="250" height="80">
+                    <img src="assets/Isotipo_CIMA_Blanco.png" alt="CIMA Logo" width="90" height="70">
                 </div>
                 <div>
                     <h1>Seguimiento - plan de 90 Días</h1>
@@ -128,6 +131,15 @@
             <button id="btn-back" class="btn-back">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
                 Volver a todos
+            </button>
+
+            <button id ="btn-ss" class="btn-ss">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Descargar
             </button>
 
             <div class="emp-header-card">

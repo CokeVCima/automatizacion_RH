@@ -51,6 +51,12 @@ function bindEvents() {
         renderView();
     };
 
+    id('btn-ss').onclick = () => {
+        if(!selectedName || !allEmployees[selectedName]) return;
+        window.descargarDossierPdf(selectedName, allEmployees, cleanedName);
+    };
+
+
     id('period-tabs').addEventListener('click', (e) => {
         const btn = e.target.closest('.tab');
         if (!btn) return;

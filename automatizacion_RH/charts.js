@@ -94,7 +94,7 @@ function renderStatusOverview(counts) {
         { label: 'En curso',   value: counts.active  || 0, color: '#2563eb' },
         { label: 'Rezagado',   value: counts.behind  || 0, color: '#dc2626' },
         { label: 'Parcial',    value: counts.halfdone|| 0, color: '#ea580c' },
-        { label: 'Sin fecha',  value: counts.no_date || 0, color: '#94a3b8' },
+        { label: 'Sin numero de empleado',  value: counts.no_date || 0, color: '#94a3b8' },
     ].filter(d => d.value > 0);
 
     instances['statusOverview'] = new Chart(ctx, {
@@ -134,11 +134,11 @@ function renderComplianceByStatus(counts, pctSums) {
     if (!ctx) return;
 
     const statuses = [
-        { key: 'done',     label: 'Completado', color: '#16a34a' },
+        //{ key: 'done',     label: 'Completado', color: '#16a34a' }, es redundante por que si esta completado siempre tiene el 100%
         { key: 'active',   label: 'En curso',   color: '#2563eb' },
         { key: 'halfdone', label: 'Parcial',     color: '#ea580c' },
         { key: 'behind',   label: 'Rezagado?',    color: '#dc2626' },
-        { key: 'no_date',  label: 'Sin fecha',   color: '#94a3b8' },
+        { key: 'no_date',  label: 'Sin numero de empleado',   color: '#94a3b8' },
     ].filter(s => (counts[s.key] || 0) > 0);
 
     const labels = statuses.map(s => s.label);
