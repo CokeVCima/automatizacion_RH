@@ -1,7 +1,11 @@
 window.descargarDossierPdf = function(selectedName, allEmployees, cleanedName) {
     const dashboard = document.getElementById('dashboard');
     const copia = dashboard.cloneNode(true);
+
+
+//aplicar filtro a period-cards para mostrar la tercera tarjeta centrada 
     const periodCards = copia.querySelector('#period-cards');
+
 
 if (periodCards) {
     periodCards.style.display = 'grid';
@@ -15,11 +19,41 @@ if (terceraTarjeta) {
     terceraTarjeta.style.gridColumn = '1 / -1';
     terceraTarjeta.style.justifySelf = 'center';
     terceraTarjeta.style.width = 'calc(50% - 8px)';
+    terceraTarjeta.style.marginBottom = '16px';
 }
     copia.querySelector('#btn-ss')?.remove();
     copia.querySelector('#btn-back')?.remove();
     copia.querySelector('.tasks-card-header')?.remove();
-    //copia.querySelector('#period-cards')?.
+// ==============================================================
+
+//clonar las graficaas para hacerlas meterlas en imagen y poder usarlas
+
+/*
+como uso clone del documento real, se clona el documento, la estructura y layout pero no funciona el contendio de las graficas, entonces
+hay que convertir cada grfica a imagen para asi insertarla en el documento final a descargar
+*/
+const originalCanvas = document.querySelector('#chart-period-bar');
+const cloneBars = copia.querySelector('#chart-period-bar');
+const img = document.createElement('img');
+
+img.src = originalCanvas.toDataURL('image/png');
+img.style.width = '100%';
+img.style.height = '100%';
+
+cloneBars.replaceWith(img);
+
+
+const originalCanvas2 = document.querySelector('#chart-task-donut');
+const cloneDonut2 = copia.querySelector('#chart-task-donut');
+const img2 = document.createElement('img');
+
+img2.src = originalCanvas2.toDataURL('image/png');
+img2.style.width = '100%';
+img2.style.height = '100%';
+
+cloneDonut2.replaceWith(img2);
+//=====================================================================
+
 
     const pdf = document.createElement('div');
     pdf.className = 'pdf-export';
@@ -44,7 +78,7 @@ if (terceraTarjeta) {
         .set({
             margin: 5,
             filename: `${selectedName}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
+            image: { type: 'jpeg', quality: 2 },
             html2canvas: { scale: 2, useCORS: true },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         })
