@@ -1,11 +1,25 @@
-'use strict';
 window.descargarDossierPdf = function(selectedName, allEmployees, cleanedName) {
     const dashboard = document.getElementById('dashboard');
     const copia = dashboard.cloneNode(true);
+    const periodCards = copia.querySelector('#period-cards');
 
+if (periodCards) {
+    periodCards.style.display = 'grid';
+    periodCards.style.gridTemplateColumns = '1fr 1fr';
+    periodCards.style.gap = '16px';
+}
+
+const terceraTarjeta = copia.querySelector('#period-cards .period-card:nth-child(3)');
+
+if (terceraTarjeta) {
+    terceraTarjeta.style.gridColumn = '1 / -1';
+    terceraTarjeta.style.justifySelf = 'center';
+    terceraTarjeta.style.width = 'calc(50% - 8px)';
+}
     copia.querySelector('#btn-ss')?.remove();
     copia.querySelector('#btn-back')?.remove();
     copia.querySelector('.tasks-card-header')?.remove();
+    //copia.querySelector('#period-cards')?.
 
     const pdf = document.createElement('div');
     pdf.className = 'pdf-export';
