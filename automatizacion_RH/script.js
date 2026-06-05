@@ -185,11 +185,15 @@ function buildEmployees(rows) {
         const deprtamentoParts = departa
             .toLowerCase()
             .charAt(0).toUpperCase() + departa.toLowerCase().slice(1);
+        
 
         const puest = row['puesto'];
         let puestoParts = puest
         if(row['puesto'] == puestoNuevo.trim()){
-            puestoParts = "No registrado"; 
+            puestoParts = row["puesto_nuevo"];
+            puestoParts = puestoParts
+            .toLowerCase()
+            .charAt(0).toUpperCase() + puestoParts.toLowerCase().slice(1)
         }else{
             puestoParts = puestoParts
             .toLowerCase()
