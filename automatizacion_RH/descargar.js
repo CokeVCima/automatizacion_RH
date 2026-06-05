@@ -80,7 +80,7 @@ if (donutContainer) donutContainer.style.cssText = 'height:auto; overflow:visibl
             image: { type: 'jpeg', quality: 0.92 },
             html2canvas: { scale: 2, useCORS: true },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            pagebreak: { mode: ['css', 'legacy'], avoid: ['.emp-header-card', '.metrics-grid', '.progress-card', '.period-cards', '.charts-row', '.chart-card', '.tasks-card'] }
+            pagebreak: { mode: ['css', 'legacy'], avoid: ['.emp-header-card', '.metrics-grid', '.progress-card', '.period-cards', '.charts-row', '.chart-card'] }
         })
         .from(pdf)
         .save()

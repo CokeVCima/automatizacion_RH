@@ -795,6 +795,7 @@ th {
 .col-periodo { width: 12%; }
 .col-tipo { width: 18%; }
 .col-status { width: 15%; }
+td.col-status { padding-left: 2px; }
 
 tbody tr {
     border-bottom: 1px solid var(--border);
@@ -828,8 +829,6 @@ td { padding: 12px 16px; vertical-align: middle; }
 }
 .task-status.done    { background: var(--grn-lt); color: var(--green); }
 .task-status.pending { background: var(--org-lt); color: var(--orange); }
-.task-status.done::before    { content: '✓'; }
-.task-status.pending::before { content: '○'; }
 
 .no-tasks {
     text-align: center;
@@ -937,6 +936,18 @@ td { padding: 12px 16px; vertical-align: middle; }
 
 .pdf-export .tasks-card {
     overflow: visible;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+}
+
+.pdf-export tbody tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.pdf-export .task-status {
+    display: inline-block;
+    white-space: nowrap;
 }
 /* ---------------------------------- */
 
