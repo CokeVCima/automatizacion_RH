@@ -896,19 +896,23 @@ td { padding: 12px 16px; vertical-align: middle; }
 }
 
 .pdf-export .charts-row {
-    grid-template-columns: repeat(1fr, 1fr);
+    grid-template-columns: 1fr 1fr;
 }
 
 
 
 .pdf-export .emp-header-card,
+.pdf-export .metrics-grid,
 .pdf-export .metric-card,
 .pdf-export .progress-card,
+.pdf-export .period-cards,
 .pdf-export .period-card,
+.pdf-export .charts-row,
 .pdf-export .chart-card,
 .pdf-export .tasks-card {
     box-shadow: none;
     break-inside: avoid;
+    page-break-inside: avoid;
 }
 
 .pdf-export .table-wrap {
@@ -927,7 +931,12 @@ td { padding: 12px 16px; vertical-align: middle; }
 }
 
 .pdf-export .chart-wrap {
-    height: 180px;
+    height: auto;
+    overflow: visible;
+}
+
+.pdf-export .tasks-card {
+    overflow: visible;
 }
 /* ---------------------------------- */
 
