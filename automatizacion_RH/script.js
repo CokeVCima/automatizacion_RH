@@ -223,8 +223,12 @@ function buildEmployees(rows) {
             map[name].jefe = row['nombre_jefe'] || '';
         }
 
-        const taskText = row['task'] || row['tarea'] || '';
+        let taskText = row['task'] || row['tarea'] || '';
         const isSubtask = taskText.startsWith(SUBTASK_PREFIX);
+
+        if(taskText.length > 500){
+         taskText = "Sin registro de tareas"
+        }
 
         map[name].tasks.push({
             task:      taskText,
@@ -657,7 +661,7 @@ function renderTaskTable(tasks, periodoFilter) {
 
     body.innerHTML = list.map(t => {
         const statusCls = t.done ? 'done' : 'pending';
-        const statusTxt = t.done ? 'Completada' : 'Pendiente';
+        const statusTxt = t.done ? '✓ Completada' : '○ Pendiente';
         const rowCls    = t.isSubtask ? 'subtask-row' : '';
 
         const taskCell = t.isSubtask
@@ -669,7 +673,7 @@ function renderTaskTable(tasks, periodoFilter) {
             ${taskCell}
             <td>${esc(t.periodo)}</td>
             <td>${esc(t.tipo)}</td>
-            <td><span class="task-status ${statusCls}">${statusTxt}</span></td>
+            <td class="col-status"><span class="task-status ${statusCls}">${statusTxt}</span></td>
         </tr>`;
     }).join('');
 }
