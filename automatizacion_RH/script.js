@@ -171,6 +171,7 @@ function buildEmployees(rows) {
 
 
     rows.forEach(row => {
+        const puestoNuevo = "*PUESTO DE NUEVA CREACIÓN*"
         const name = row['empleado'] || '';
         const superv = row['supervisor'] || '';
         const supervisorParts = superv
@@ -179,7 +180,22 @@ function buildEmployees(rows) {
             .split(/\s+/)
             .filter(Boolean)
             .map(n => n.charAt(0).toUpperCase() + n.slice(1));
+        
+        const departa = row['departamento'] || '';
+        const deprtamentoParts = departa
+            .toLowerCase()
+            .charAt(0).toUpperCase() + departa.toLowerCase().slice(1);
 
+        const puest = row['puesto'];
+        let puestoParts = puest
+        if(row['puesto'] == puestoNuevo.trim()){
+            puestoParts = "No registrado"; 
+        }else{
+            puestoParts = puestoParts
+            .toLowerCase()
+            .charAt(0).toUpperCase() + puest.toLowerCase().slice(1);
+        
+        }
         const cleanedSupervisor = supervisorParts.slice(0, 2).join(' ');
         if (!name) return;
 
@@ -189,8 +205,8 @@ function buildEmployees(rows) {
                 empId:      row['numero_empleado'] || row['noempleado'] || '',
                 supervisor: cleanedSupervisor ? cleanedSupervisor : '', //row['supervisor'] ? row['supervisor'].toLowerCase() : '',
                 fechaIngreso: parseDate(row['fecha_ingreso']) || row['sin_fecha_ingreso'],
-                departamento: row['departamento'] || '',
-                puesto: row['puesto'] || '',
+                departamento: deprtamentoParts || '',
+                puesto: puestoParts || '',
                 jefe: row['nombre_jefe'] || '',
                 tasks: [],
             };
@@ -198,8 +214,8 @@ function buildEmployees(rows) {
             map[name].empId = row['numero_empleado'] || row['noempleado'] || '';
             map[name].supervisor = cleanedSupervisor ? cleanedSupervisor : ''; //row['supervisor'] ? row['supervisor'].toLowerCase() : '';
             map[name].fechaIngreso = parseDate(row['fecha_ingreso']) || row['sin_fecha_ingreso'];
-            map[name].departamento = row['departamento'] || '';
-            map[name].puesto = row['puesto'] || '';
+            map[name].departamento = deprtamentoParts || '';
+            map[name].puesto = puestoParts || '';
             map[name].jefe = row['nombre_jefe'] || '';
         }
 
@@ -574,9 +590,9 @@ function renderDashboard(emp) {
     id('emp-avatar-lg').textContent  = initials;
     id('emp-avatar-lg').style.background = color;
     id('emp-name').textContent       = emp.name;
-    id('emp-departamento').textContent = emp.departamento ? `Departamento: ${emp.departamento}` : 'No registrado';
-    id('emp-puesto').textContent = emp.puesto ? `Puesto: ${emp.puesto}` : 'No registrado';
-    id('emp-jefe').textContent = emp.jefe ? `Jefe: ${emp.jefe}` : 'No registrado';
+    id('emp-departamento').textContent = emp.departamento ? `Departamento: ${emp.departamento}` : 'Departamento: No registrado';
+    id('emp-puesto').textContent = emp.puesto ? `Puesto: ${emp.puesto}` : 'Puesto: No registrado';
+    id('emp-jefe').textContent = emp.jefe ? `Jefe: ${emp.jefe}` : 'Jefe: No registrado';
     id('emp-id').textContent         = emp.empId ? `ID #${emp.empId}` : '';
     id('emp-supervisor').textContent = emp.supervisor ? `Supervisor: ${cleanedSupervisor}` : '';
     id('emp-ingreso').textContent    = emp.fechaIngreso
