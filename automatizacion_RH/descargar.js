@@ -3,7 +3,7 @@ window.descargarDossierPdf = function(selectedName, allEmployees, cleanedName) {
     const copia = dashboard.cloneNode(true);
 
 
-//aplicar filtro a period-cards para mostrar la tercera tarjeta centrada 
+//aplicar filtro a period-cards para mostrar la tercera tarjeta centrada
     const periodCards = copia.querySelector('#period-cards');
 
 
@@ -35,23 +35,27 @@ hay que convertir cada grfica a imagen para asi insertarla en el documento final
 const originalCanvas = document.querySelector('#chart-period-bar');
 const cloneBars = copia.querySelector('#chart-period-bar');
 const img = document.createElement('img');
-
 img.src = originalCanvas.toDataURL('image/png');
-img.style.width = '100%';
-img.style.height = '100%';
-
-cloneBars.replaceWith(img);
-
+img.style.cssText = 'width:100%; height:auto; display:block;';
 
 const originalCanvas2 = document.querySelector('#chart-task-donut');
 const cloneDonut2 = copia.querySelector('#chart-task-donut');
 const img2 = document.createElement('img');
-
 img2.src = originalCanvas2.toDataURL('image/png');
-img2.style.width = '100%';
-img2.style.height = '100%';
+img2.style.cssText = 'width:100%; height:auto; display:block;';
 
+const barsContainer = cloneBars.parentElement;
+const donutContainer = cloneDonut2.parentElement;
+
+cloneBars.replaceWith(img);
 cloneDonut2.replaceWith(img2);
+
+const chartsWrapper = barsContainer?.parentElement;
+if (chartsWrapper) {
+    chartsWrapper.style.cssText = 'display:flex; flex-direction:row; gap:16px; width:100%;';
+    if (barsContainer)  barsContainer.style.cssText  = 'flex:1; min-width:0;';
+    if (donutContainer) donutContainer.style.cssText = 'flex:1; min-width:0;';
+}
 //=====================================================================
 
 
@@ -74,7 +78,6 @@ cloneDonut2.replaceWith(img2);
     document.body.appendChild(pdf);
 
      html2pdf()
-
         .set({
             margin: 5,
             filename: `${selectedName}.pdf`,

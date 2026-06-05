@@ -30,6 +30,10 @@ function bindEvents() {
     id('btn-retry').onclick       = () => loadData(CSV_URL);
     id('btn-reconfig').onclick    = openConfig;
 
+    function supervisor_filter(supervisor){
+
+    }
+
     // Filters
     const syncFilterAccent = (selectId, groupId) => {
         const sel = id(selectId);
@@ -39,6 +43,7 @@ function bindEvents() {
         update();
         return sel;
     };
+
     const empSel2 = syncFilterAccent('filter-employee', 'fg-employee');
     empSel2.addEventListener('change', (e) => { selectedName = e.target.value || null; renderView(); });
     syncFilterAccent('filter-supervisor', 'fg-supervisor').addEventListener('change', renderView);
@@ -164,22 +169,38 @@ function parseCSV(text) {
 function buildEmployees(rows) {
     const map = {};
 
+
     rows.forEach(row => {
         const name = row['empleado'] || '';
+        const superv = row['supervisor'] || '';
+        const supervisorParts = superv
+            .toLowerCase()
+            .replace(/\.|@/g, ' ')
+            .split(/\s+/)
+            .filter(Boolean)
+            .map(n => n.charAt(0).toUpperCase() + n.slice(1));
+
+        const cleanedSupervisor = supervisorParts.slice(0, 2).join(' ');
         if (!name) return;
 
         if (!map[name]) {
             map[name] = {
                 name,
                 empId:      row['numero_empleado'] || row['noempleado'] || '',
-                supervisor: row['supervisor'] ? row['supervisor'].toLowerCase() : '',
-                fechaIngreso: parseDate(row['fecha_ingreso']) || row['sin_fecha_ingreso'], 
+                supervisor: cleanedSupervisor ? cleanedSupervisor : '', //row['supervisor'] ? row['supervisor'].toLowerCase() : '',
+                fechaIngreso: parseDate(row['fecha_ingreso']) || row['sin_fecha_ingreso'],
+                departamento: row['departamento'] || '',
+                puesto: row['puesto'] || '',
+                jefe: row['nombre_jefe'] || '',
                 tasks: [],
             };
         } else if (!map[name].empId) {
             map[name].empId = row['numero_empleado'] || row['noempleado'] || '';
-            map[name].supervisor = row['supervisor'] ? row['supervisor'].toLowerCase() : '';
+            map[name].supervisor = cleanedSupervisor ? cleanedSupervisor : ''; //row['supervisor'] ? row['supervisor'].toLowerCase() : '';
             map[name].fechaIngreso = parseDate(row['fecha_ingreso']) || row['sin_fecha_ingreso'];
+            map[name].departamento = row['departamento'] || '';
+            map[name].puesto = row['puesto'] || '';
+            map[name].jefe = row['nombre_jefe'] || '';
         }
 
         const taskText = row['task'] || row['tarea'] || '';
@@ -356,6 +377,10 @@ function renderView() {
 
 function renderSupervisorRating(supervisor, list) {
     const card = id('supervisor-rating-card');
+    const supervisorReplace = supervisor.replace(/\.|@/g, " ");
+    const supervisorClean = supervisorReplace.split(" ")
+    const buildSupervisor = supervisorClean.map (n => ((n.charAt(0).toUpperCase() + n.slice(1)).split(" ")) );
+    const cleanedSupervisor = `${buildSupervisor[0]} ${buildSupervisor[1]}`;
     if (!supervisor || !list.length) {
         card.classList.add('hidden');
         card.innerHTML = '';
@@ -368,7 +393,7 @@ function renderSupervisorRating(supervisor, list) {
         <div class="rating-main">
             <div>
                 <div class="rating-eyebrow">Calificación del supervisor</div>
-                <h2>${esc(supervisor)}</h2>
+                <h2>${esc(cleanedSupervisor)}</h2>
             </div>
             <div class="rating-score">
                 <span>${rating.score}</span>
@@ -422,7 +447,7 @@ function supervisorRating(list) {
     if (score >= 85) { label = 'Excelente'; level = 'excellent'; }
     else if (score >= 70) { label = 'Bueno'; level = 'good'; }
     else if (score >= 50) { label = 'En riesgo'; level = 'risk'; }
-    else { label = 'Crítico'; level = 'critical'; }
+    else { label = 'Crítico'; level = 'critical';  }
 
     return {
         score,
@@ -484,7 +509,7 @@ function renderGrid(list) {
         const color      = avatarColor(emp.name);
         const badgeCls   = { done: 'badge-done', behind: 'badge-behind', active: 'badge-active', halfdone: 'badge-halfdone', no_date: 'badge-no-date' }[m.status];
         const badgeTxt   = { done: 'Completado', behind: 'Rezagado',    active: 'En curso', halfdone: 'Parcial', no_date: ''    }[m.status];
-        const dayText    = m.daysIn !== null ? `Día ${m.daysIn} de 90` : 'Sin fecha de ingreso';
+        const dayText    = m.daysIn !== null ? `Día ${m.daysIn} de 90` : 'Sin numero de empleado';
         const markerLeft = m.timePct !== null ? `style="left:${m.timePct}%"` : '';
 
         return `
@@ -530,13 +555,30 @@ function renderDashboard(emp) {
     const m      = metrics(emp);
     const color  = avatarColor(emp.name);
     const initials = avatarInitials(emp.name);
-
+    //limpiar nombre del supervisor para mostar solo nombre y apelido a partir de el correo
+    const supervisor = emp.supervisor ? emp.supervisor : '';
+    const supervisorReplace = supervisor.replace(/\.|@/g, " ");
+    const supervisorClean = supervisorReplace.split(" ")
+    const buildSupervisor = supervisorClean.map (n => ((n.charAt(0).toUpperCase() + n.slice(1)).split(" ")) );
+    const cleanedSupervisor = `${buildSupervisor[0]} ${buildSupervisor[1]}`;
+    console.log(emp.departamento)
+    console.log(emp.puesto)
+    console.log(emp.jefe)
+    /*
+   console.log(supervisorReplace);
+   console.log(supervisorClean);
+   console.log(buildSupervisor);
+   console.log(cleanedSupervisor);
+   */
     // Header card
     id('emp-avatar-lg').textContent  = initials;
     id('emp-avatar-lg').style.background = color;
     id('emp-name').textContent       = emp.name;
+    id('emp-departamento').textContent = emp.departamento ? `Departamento: ${emp.departamento}` : 'No registrado';
+    id('emp-puesto').textContent = emp.puesto ? `Puesto: ${emp.puesto}` : 'No registrado';
+    id('emp-jefe').textContent = emp.jefe ? `Jefe: ${emp.jefe}` : 'No registrado';
     id('emp-id').textContent         = emp.empId ? `ID #${emp.empId}` : '';
-    id('emp-supervisor').textContent = emp.supervisor ? `Supervisor: ${emp.supervisor}` : '';
+    id('emp-supervisor').textContent = emp.supervisor ? `Supervisor: ${cleanedSupervisor}` : '';
     id('emp-ingreso').textContent    = emp.fechaIngreso
         ? `Ingreso: ${emp.fechaIngreso.toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' })}`
         : '';
