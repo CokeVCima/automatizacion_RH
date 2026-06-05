@@ -50,12 +50,8 @@ const donutContainer = cloneDonut2.parentElement;
 cloneBars.replaceWith(img);
 cloneDonut2.replaceWith(img2);
 
-const chartsWrapper = barsContainer?.parentElement;
-if (chartsWrapper) {
-    chartsWrapper.style.cssText = 'display:flex; flex-direction:row; gap:16px; width:100%;';
-    if (barsContainer)  barsContainer.style.cssText  = 'flex:1; min-width:0;';
-    if (donutContainer) donutContainer.style.cssText = 'flex:1; min-width:0;';
-}
+if (barsContainer)  barsContainer.style.cssText  = 'height:auto; overflow:visible;';
+if (donutContainer) donutContainer.style.cssText = 'height:auto; overflow:visible;';
 //=====================================================================
 
 
@@ -81,9 +77,10 @@ if (chartsWrapper) {
         .set({
             margin: 5,
             filename: `${selectedName}.pdf`,
-            image: { type: 'jpeg', quality: 2 },
+            image: { type: 'jpeg', quality: 0.92 },
             html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+            pagebreak: { mode: ['css', 'legacy'], avoid: ['.emp-header-card', '.metrics-grid', '.progress-card', '.period-cards', '.charts-row', '.chart-card', '.tasks-card'] }
         })
         .from(pdf)
         .save()
