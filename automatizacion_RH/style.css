@@ -880,8 +880,16 @@ td { padding: 12px 16px; vertical-align: middle; }
 .pdf-export {
     width: 190mm;
     padding: 10mm;
-    background: white;
+    background: #CCCCD8;
     color: #111827;
+}
+
+.pdf-export .header-content {
+    background-color: #01013C;
+    padding: 10px 16px;
+    margin: -10mm -10mm 10mm -10mm;
+    height: auto;
+    max-width: unset;
 }
 
 .pdf-export #dashboard {
@@ -889,15 +897,87 @@ td { padding: 12px 16px; vertical-align: middle; }
     width: 100%;
 }
 
-.pdf-export .metrics-grid,
-.pdf-export .charts-row {
-    grid-template-columns: 1fr 1fr;
+.pdf-export .metrics-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
 }
 
-.pdf-export .charts-row {
-    grid-template-columns: 1fr 1fr;
+/* charts-row y period-cards se manejan via inline styles en descargar.js para ser robustos ante saltos de página */
+
+.pdf-export .pdf-period-section {
+    clear: both;
+    box-sizing: border-box;
+    padding-top: 34mm;
+    break-before: page;
+    page-break-before: always;
+    break-inside: avoid;
+    page-break-inside: avoid;
 }
 
+.pdf-export .pdf-period-cards {
+    display: block;
+    overflow: hidden;
+    break-before: auto;
+    page-break-before: auto;
+}
+
+.pdf-export .pdf-period-row {
+    display: block;
+    width: 100%;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.pdf-export .pdf-period-row-top {
+    display: table;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 16px;
+}
+
+.pdf-export .pdf-period-cell {
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.pdf-export .pdf-period-row-top .pdf-period-cell {
+    display: table-cell;
+    width: 50%;
+    vertical-align: top;
+}
+
+.pdf-export .pdf-period-cell-left {
+    padding-right: 8px;
+}
+
+.pdf-export .pdf-period-cell-right {
+    padding-left: 8px;
+}
+
+.pdf-export .pdf-period-cell-bottom {
+    display: block;
+    width: 50%;
+    margin: 0 auto;
+}
+
+.pdf-export .pdf-period-row .period-card {
+    display: block;
+    float: none;
+    width: 100%;
+    margin-bottom: 0;
+    vertical-align: top;
+}
+
+.pdf-export .period-fraction {
+    white-space: nowrap;
+}
+
+.pdf-export .pdf-tasks-export {
+    clear: both;
+    break-before: page;
+    page-break-before: always;
+}
 
 
 .pdf-export .emp-header-card,
@@ -907,11 +987,17 @@ td { padding: 12px 16px; vertical-align: middle; }
 .pdf-export .period-cards,
 .pdf-export .period-card,
 .pdf-export .charts-row,
-.pdf-export .chart-card,
-.pdf-export .tasks-card {
+.pdf-export .chart-card {
     box-shadow: none;
     break-inside: avoid;
     page-break-inside: avoid;
+}
+
+.pdf-export .tasks-card {
+    box-shadow: none;
+    overflow: visible;
+    break-inside: auto;
+    page-break-inside: auto;
 }
 
 .pdf-export .table-wrap {
@@ -932,12 +1018,6 @@ td { padding: 12px 16px; vertical-align: middle; }
 .pdf-export .chart-wrap {
     height: auto;
     overflow: visible;
-}
-
-.pdf-export .tasks-card {
-    overflow: visible;
-    break-inside: auto !important;
-    page-break-inside: auto !important;
 }
 
 .pdf-export tbody tr {

@@ -598,9 +598,9 @@ function renderDashboard(emp) {
     id('emp-avatar-lg').textContent  = initials;
     id('emp-avatar-lg').style.background = color;
     id('emp-name').textContent       = emp.name;
-    id('emp-departamento').textContent = emp.departamento ? `Departamento: ${emp.departamento}` : 'Departamento: No registrado';
-    id('emp-puesto').textContent = emp.puesto ? `Puesto: ${emp.puesto}` : 'Puesto: No registrado';
-    id('emp-jefe').textContent = emp.jefe ? `Jefe: ${emp.jefe}` : 'Jefe: No registrado';
+    id('emp-departamento').innerHTML = emp.departamento ? `<b>Departamento:</b> ${emp.departamento}` : '<b>Departamento:</b> No registrado';
+    id('emp-puesto').innerHTML = emp.puesto ? `<b>Puesto:</b> ${emp.puesto}` : '<b>Puesto:</b> No registrado';
+    id('emp-jefe').innerHTML = emp.jefe ? `<b>Jefe:</b> ${emp.jefe}` : '<b>Jefe:</b> No registrado';
     id('emp-id').textContent         = emp.empId ? `ID #${emp.empId}` : '';
     id('emp-supervisor').textContent = emp.supervisor ? `Supervisor: ${cleanedSupervisor}` : '';
     id('emp-ingreso').textContent    = emp.fechaIngreso
