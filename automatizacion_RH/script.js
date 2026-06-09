@@ -610,12 +610,35 @@ function renderDashboard(emp) {
     const badgeCls = { done: 'badge-done', behind: 'badge-behind', active: 'badge-active', halfdone: 'badge-halfdone', no_date: 'badge-no-date' }[m.status];
     const badgeTxt = { done: 'Plan completado', behind: 'Rezagado', active: 'En curso', halfdone: 'Parcial', no_date: '' }[m.status];
     id('emp-status-badge').innerHTML = `<span class="badge ${badgeCls}">${badgeTxt}</span>`;
-
+    //.metric-card.accent .metric-value { color: var(--green); }
     // Metric cards
     id('m-days-in').textContent    = m.daysIn    !== null ? m.daysIn    : '—';
     id('m-days-left').textContent  = m.daysLeft  !== null ? m.daysLeft  : '—';
     id('m-task-pct').textContent   = `${m.taskPct}%`;
     id('m-tasks-count').textContent = `${m.done}/${m.total}`;
+
+    const taskMetricCard = id('metric-card-color');
+    const taskMetricValue = id('m-task-pct');
+
+    if(m.taskPct >= 80){
+
+        taskMetricCard.style.background = 'linear-gradient(135deg, #f0fdf4, #dcfce7)';
+        taskMetricCard.style.borderColor = '#bbf7d0';
+        taskMetricValue.style.color = 'var(--green)';
+    }else if(m.taskPct >= 70){
+
+        taskMetricCard.style.background = 'linear-gradient(135deg, #fffbeb, #fef3c7)';
+        taskMetricCard.style.borderColor = '#fde68a';
+        taskMetricValue.style.color = 'var(--orange)';
+
+    }else{
+
+        taskMetricCard.style.background = 'linear-gradient(135deg, #fef2f2, #fee2e2)';
+        taskMetricCard.style.borderColor = '#fecaca';
+        taskMetricValue.style.color = 'var(--red)';
+
+    }
+
 
     // Progress bars
     id('prog-task-fill').style.width = `${m.taskPct}%`;

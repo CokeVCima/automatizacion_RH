@@ -21,6 +21,12 @@ window.descargarDossierPdf = function(selectedName, allEmployees, cleanedNameFn)
     };
     const st = statusMap[m.status] || statusMap.active;
 
+    const taskMetricStyle = m.taskPct >= 80
+        ? { accent: '#16a34a', bg: '#f0fdf4', border: '#bbf7d0' }
+        : m.taskPct >= 70
+            ? { accent: '#ea580c', bg: '#fffbeb', border: '#fde68a' }
+            : { accent: '#dc2626', bg: '#fef2f2', border: '#fecaca' };
+
     // Capturar gráficas del DOM actual
     const canvasDonut = document.querySelector('#chart-task-donut');
     const canvasBar   = document.querySelector('#chart-period-bar');
@@ -31,13 +37,13 @@ window.descargarDossierPdf = function(selectedName, allEmployees, cleanedNameFn)
     const kpis = [
         { val: m.daysIn  !== null ? m.daysIn  : '—', label: 'Días en la empresa',       accent: '#2563eb', bg: '#eff6ff' },
         { val: m.daysLeft !== null ? m.daysLeft : '—', label: 'Días restantes del plan', accent: '#7c3aed', bg: '#f5f3ff' },
-        { val: `${m.taskPct}%`,                        label: 'Tareas completadas',       accent: '#16a34a', bg: '#f0fdf4' },
+        { val: `${m.taskPct}%`,                        label: 'Tareas completadas',       ...taskMetricStyle },
         { val: `${m.done}/${m.total}`,                 label: 'Total de tareas',          accent: '#0891b2', bg: '#ecfeff' },
     ];
 
     const kpiHtml = kpis.map(k => `
         <div style="display:table-cell;width:25%;padding:0 5px;vertical-align:top;">
-            <div style="background:${k.bg};border:1px solid #e2e8f0;border-top:3px solid ${k.accent};border-radius:10px;padding:14px 12px;text-align:center;">
+            <div style="background:${k.bg};border:1px solid ${k.border || '#e2e8f0'};border-top:3px solid ${k.accent};border-radius:10px;padding:14px 12px;text-align:center;">
                 <div style="font-size:28px;font-weight:800;color:${k.accent};line-height:1;">${k.val}</div>
                 <div style="font-size:10.5px;color:#64748b;margin-top:5px;line-height:1.3;">${k.label}</div>
             </div>
@@ -149,9 +155,9 @@ window.descargarDossierPdf = function(selectedName, allEmployees, cleanedNameFn)
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
                 <span style="font-size:11.5px;color:#64748b;width:88px;flex-shrink:0;">Completado</span>
                 <div style="flex:1;height:10px;background:#f1f5f9;border-radius:99px;overflow:hidden;">
-                    <div style="height:100%;width:${m.taskPct}%;background:#16a34a;border-radius:99px;"></div>
+                    <div style="height:100%;width:${m.taskPct}%;background:${taskMetricStyle.accent};border-radius:99px;"></div>
                 </div>
-                <span style="font-size:13px;font-weight:700;width:38px;text-align:right;color:#16a34a;">${m.taskPct}%</span>
+                <span style="font-size:13px;font-weight:700;width:38px;text-align:right;color:${taskMetricStyle.accent};">${m.taskPct}%</span>
             </div>
 
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
